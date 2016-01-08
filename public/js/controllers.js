@@ -12,6 +12,7 @@ function IndexCtrl($scope, $http) {
 function AddPostCtrl($scope, $http, $location) {
   $scope.form = {};
   $scope.submitPost = function () {
+    console.log('post: ', $scope.form);
     $http.post('/api/post', $scope.form).
       success(function(data) {
         $location.path('/');
@@ -26,18 +27,19 @@ function ReadPostCtrl($scope, $http, $routeParams) {
     });
 }
 
-function ClonePostCtrl($scope, $http, $routeParams) {
-  $http.get('/api/clone/' + $routeParams.id).
+function ClonePostCtrl($scope, $http, $location, $routeParams) {
+  $scope.post = {};
+  $http.get('/api/post/' + $routeParams.id).
     success(function(data) {
+      console.log(data.post);
       $scope.post = data.post;
     });
 
-  $scope.clonePost = function () {
-    $http.put('/api/clone/' + $routeParams.id, $scope.form).
+   $http.get('/api/clone/' + $routeParams.id).
       success(function(data) {
-          $location.url('/');
+            console.log('toll'); 
       });
-  };
+  
 
 }
 

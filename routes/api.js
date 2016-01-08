@@ -51,6 +51,8 @@ exports.post = function (req, res) {
 
 exports.addPost = function (req, res) {
   data.posts.push(req.body);
+  console.log('added:');
+  console.log(data.posts);
   res.json(req.body);
 };
 
@@ -77,5 +79,24 @@ exports.deletePost = function (req, res) {
     res.json(true);
   } else {
     res.json(false);
+  }
+};
+
+
+exports.clonePostMethod = function (req, res) {
+  var id = req.params.id;
+  console.log(id);
+
+  if (id >= 0 && id < data.posts.length) {
+     var post = data.posts[id];
+       console.log(post);
+     var post2 = {
+      title: post.title,
+      text: post.text
+     };
+
+    data.posts.push(post2);
+    console.log('super');
+    res.json(post2);
   }
 };
