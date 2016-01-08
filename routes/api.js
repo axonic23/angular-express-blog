@@ -17,7 +17,10 @@ var data = {
   ]
 };
 
-// GET
+
+
+
+
 
 exports.posts = function (req, res) {
   var posts = [];

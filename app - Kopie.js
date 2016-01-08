@@ -32,19 +32,12 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
-
-// client.query("CREATE TABLE IF NOT EXISTS emps(firstname varchar(64), lastname varchar(64))");
-// client.query("INSERT INTO emps(firstname, lastname) values($1, $2)", ['Ronald', 'McDonald']);
-// client.query("INSERT INTO emps(firstname, lastname) values($1, $2)", ['Mayor', 'McCheese']);
-
-
 // Routes
+
 app.get('/', routes.index);
 app.get('/partials/:name', routes.partials);
 
 // JSON API
-
-
 
 app.get('/api/posts', api.posts);
 
