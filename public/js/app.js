@@ -12,6 +12,10 @@ angular.module('myApp', ['myApp.filters', 'myApp.services', 'myApp.directives'])
         templateUrl: 'partials/addPost',
         controller: AddPostCtrl
       }).
+        when('/clonePost', {
+        templateUrl: 'partials/clonePost',
+        controller: ClonePostCtrl
+      }).
       when('/readPost/:id', {
         templateUrl: 'partials/readPost',
         controller: ReadPostCtrl

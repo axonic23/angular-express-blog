@@ -26,6 +26,21 @@ function ReadPostCtrl($scope, $http, $routeParams) {
     });
 }
 
+function ClonePostCtrl($scope, $http, $routeParams) {
+  $http.get('/api/clone/' + $routeParams.id).
+    success(function(data) {
+      $scope.post = data.post;
+    });
+
+  $scope.clonePost = function () {
+    $http.put('/api/clone/' + $routeParams.id, $scope.form).
+      success(function(data) {
+          $location.url('/');
+      });
+  };
+
+}
+
 function EditPostCtrl($scope, $http, $location, $routeParams) {
   $scope.form = {};
   $http.get('/api/post/' + $routeParams.id).

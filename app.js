@@ -33,10 +33,6 @@ app.configure('production', function(){
 });
 
 
-// client.query("CREATE TABLE IF NOT EXISTS emps(firstname varchar(64), lastname varchar(64))");
-// client.query("INSERT INTO emps(firstname, lastname) values($1, $2)", ['Ronald', 'McDonald']);
-// client.query("INSERT INTO emps(firstname, lastname) values($1, $2)", ['Mayor', 'McCheese']);
-
 
 // Routes
 app.get('/', routes.index);
@@ -45,9 +41,8 @@ app.get('/partials/:name', routes.partials);
 // JSON API
 
 
-
+app.get('/api/clone/:id', api.clone);
 app.get('/api/posts', api.posts);
-
 app.get('/api/post/:id', api.post);
 app.post('/api/post', api.addPost);
 app.put('/api/post/:id', api.editPost);
