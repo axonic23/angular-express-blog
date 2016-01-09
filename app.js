@@ -40,7 +40,6 @@ app.get('/partials/:name', routes.partials);
 
 // JSON API
 
-
 app.get('/api/clone/:id', api.clonePostMethod); // in api.js
 app.get('/api/posts', api.posts);
 app.get('/api/post/:id', api.post);
@@ -53,6 +52,6 @@ app.get('*', routes.index);
 
 // Start server
 //app.listen(process.env.PORT, function(){
-app.listen(3000, function(){
+app.listen(process.env.PORT, function(){
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
