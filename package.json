@@ -5,6 +5,7 @@
   "dependencies": {
     "express": "2.5.10",
     "jade": ">= 0.0.1",
+    "knex": "^0.9.0",
     "pg": "4.4.3"
   }
 }

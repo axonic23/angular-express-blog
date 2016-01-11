@@ -17,25 +17,81 @@ var data = {
   ]
 };
 
+var myconnection = {};
+// postgres://icxyahacpgkjdy:MAbPxkhbYP3yGyaHFjqhTxH3HS@ec2-54-83-52-71.compute-1.amazonaws.com:5432/d74440l4p0o95
+if (process.env.DATABASE_URL){
+  myconnection = process.env.DATABASE_URL;
+}
+else {
+
+ myconnection = {
+    host     : '127.0.0.1',
+    user     : 'postgres',
+    password : 'zenkit123',
+    database : 'mytestpg'
+  };
+}
+
+console.log('k1');
+var knex = require('knex')({
+  client: 'pg',
+  connection: myconnection
+});
+
+console.log('k2');
+knex.schema.createTableIfNotExists('myusers', function (table) {
+  table.increments();
+  table.string('myname');
+  table.timestamps();
+})
+.catch(function(err){
+   console.log(err);
+});
+
+knex.schema.createTableIfNotExists('myposts', function (table) {
+  table.increments();
+  table.string('mytitle');
+  table.string('mytext');
+  table.timestamps();
+})
+.catch(function(err){
+   console.log(err);
+});
+console.log('k3');
 
 
-
-
-
+/*
 exports.posts = function (req, res) {
   var posts = [];
   data.posts.forEach(function (post, i) {
     posts.push({
       id: i,
       title: post.title,
-      text: post.text.substr(0, 50) + '...'
+      text: post.text
     });
   });
-  res.json({
-    posts: posts
+*/
+function toClientSchema(serverPost){
+  return  { text: serverPost.mytext,
+                  title: serverPost.mytitle,
+                id: serverPost.id
+                };
+}
+
+
+
+exports.posts = function (req, res) {
+  knex.select('mytitle', 'mytext', 'id').from('myposts')
+    .then(function(posts){
+       console.log(posts);
+       res.json({
+      posts: posts.map(toClientSchema)   // jesses magie: map ruft für jedes element im arry eine function auf
+    });
   });
+
 };
 
+/*
 exports.post = function (req, res) {
   var id = req.params.id;
   if (id >= 0 && id < data.posts.length) {
@@ -46,19 +102,48 @@ exports.post = function (req, res) {
     res.json(false);
   }
 };
+*/
 
-// POST
+exports.post = function (req, res) {
+  var id = req.params.id;
 
-exports.addPost = function (req, res) {
-  data.posts.push(req.body);
-  console.log('added:');
-  console.log(data.posts);
-  res.json(req.body);
+  knex.select('mytitle', 'mytext', 'id').from('myposts').where('id',id)
+    .then(function(posts){
+       console.log(posts[0]);
+       res.json({
+          post: toClientSchema(posts[0])
+        });
+
+  });
+
 };
 
-// PUT
 
-exports.editPost = function (req, res) {
+// POST : erzeugt einen komplett neuen!
+/*
+exports.addPost = function (req, res) {  
+  data.posts.push(req.body);
+  console.log('added:');
+
+  req.body.id = data.posts.length-1;  
+  console.log(req.body);
+  res.json(req.body);
+};
+*/
+exports.addPost = function (req, res) {  
+var newpost = {mytitle: req.body.title, mytext: req.body.text};
+ knex('myposts').insert( newpost).returning('*')
+    .then(function(posts){
+       console.log(posts[0] );
+       res.json( toClientSchema(posts[0]) );
+  });
+
+};
+
+// PUT  -> q:updated ein bestehenden artikel (EDIT)
+/*
+
+exports.putPost = function (req, res) {
   var id = req.params.id;
 
   if (id >= 0 && id < data.posts.length) {
@@ -68,9 +153,25 @@ exports.editPost = function (req, res) {
     res.json(false);
   }
 };
+*/
+exports.putPost = function (req, res) {
+  var id = req.params.id;
+
+knex('myposts')
+  .where('id', id)
+  .update({
+    mytext: req.body.text,
+    mytitle: req.body.title
+  })
+  .then(function(posts){
+      res.json(true);
+    });
+ 
+ 
+};
 
 // DELETE
-
+/*
 exports.deletePost = function (req, res) {
   var id = req.params.id;
 
@@ -82,6 +183,19 @@ exports.deletePost = function (req, res) {
   }
 };
 
+*/
+
+
+exports.deletePost = function (req, res) {
+  var id = req.params.id;
+knex('myposts')
+  .where('id', id)
+  .del()
+   .then(function(posts){
+      res.json(true);
+    });
+};
+
 
 exports.clonePostMethod = function (req, res) {
   var id = req.params.id;
@@ -91,12 +205,13 @@ exports.clonePostMethod = function (req, res) {
      var post = data.posts[id];
        console.log(post);
      var post2 = {
-      title: post.title,
-      text: post.text
+      title: post.title + ' (Cloned)',
+      text: post.text,
+      id : data.posts.length
      };
-
     data.posts.push(post2);
-    console.log('super');
-    res.json(post2);
+    console.log(post2);
+
+   res.json(post2);
   }
 };
