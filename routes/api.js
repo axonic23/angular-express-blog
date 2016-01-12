@@ -90,7 +90,7 @@ exports.posts = function (req, res) {
 }
 else
 {
-   res.json('');
+   res.json('no posts for this user');
 }
 };
 
