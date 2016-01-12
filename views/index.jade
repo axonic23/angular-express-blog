@@ -9,6 +9,14 @@ block body
       li
         a(href='/addPost') Add a new post
 
+    form( action='/api/login' method='post')
+      input( name='username')
+      input( name='password')
+      button(type='submit') Login
+
+    div( ng-controller = 'LoginController')
+      p {{userOnClient.name}} {{userOnClient.age}}
+
     div(ng-view)
 
   script(src='js/lib/angular/angular.js')

@@ -9,6 +9,13 @@ function IndexCtrl($scope, $http) {   // q: angular.module('todoApp', [])  .cont
     });
 }
 
+function LoginCtrl($scope, $http) {   
+  $http.get('/api/currentuser').
+    success(function(data) {
+      $scope.userOnClient = data.currentUser;
+    });
+}
+
 function AddPostCtrl($scope, $http, $location) {
   $scope.form = {};
   $scope.submitPost = function () {

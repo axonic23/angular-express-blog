@@ -4,6 +4,14 @@
 
 // For a real app, you'd make database requests here.
 // For this example, "data" acts like an in-memory "database"
+
+var passport ;
+
+exports.init = function(pPassport){
+   passport = pPassport;
+}
+
+
 var data = {
   "posts": [
     {
@@ -17,14 +25,26 @@ var data = {
   ]
 };
 
+var users = {
+  "users": [
+    {
+      "name": "heinz",
+      "password": "123"
+    },
+    {
+      "name": "otto",
+      "password": "otto"
+    }
+  ]
+};
+
 var myconnection = {};
 // postgres://icxyahacpgkjdy:MAbPxkhbYP3yGyaHFjqhTxH3HS@ec2-54-83-52-71.compute-1.amazonaws.com:5432/d74440l4p0o95
 if (process.env.DATABASE_URL){
-  myconnection = process.env.DATABASE_URL;
+   myconnection = process.env.DATABASE_URL;
 }
 else {
-
- myconnection = {
+   myconnection = {
     host     : '127.0.0.1',
     user     : 'postgres',
     password : 'zenkit123',
@@ -196,6 +216,30 @@ knex('myposts')
     });
 };
 
+exports.getCurrentUser = function (req, res, next) {
+    console.log('getCurrentUser auth?:'+req.isAuthenticated() );
+    console.log('current user:' +req.user);
+  res.json({currentUser:req.user});
+};
+
+exports.loginPostMethod = function (req, res, next) {
+  console.log(req.body);
+  var handler = passport.authenticate('local', function(err,user, info) {
+      console.log(user);
+      console.log(err);
+      console.log(info);
+      console.log('auth:'+req.isAuthenticated());
+      req.login(user, function(err) {
+         if (err) { 
+            return next(err);
+         }
+         console.log('auth2:'+req.isAuthenticated());
+         return res.redirect('/');
+      });
+  
+  });
+  handler(req,res,next);
+};
 
 exports.clonePostMethod = function (req, res) {
   var id = req.params.id;
