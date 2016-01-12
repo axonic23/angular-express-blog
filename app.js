@@ -27,7 +27,7 @@ var bodyParser   = require('body-parser');
 var app = module.exports = express.createServer();
 
 // Configuration
-
+/*
 passport.use(new LocalStrategy(
   function(username, password, done) {
     console.log(username + ' ' + password);
@@ -41,6 +41,57 @@ passport.use(new LocalStrategy(
    
   }
 ));
+*/
+
+
+
+var myconnection = {};
+// postgres://icxyahacpgkjdy:MAbPxkhbYP3yGyaHFjqhTxH3HS@ec2-54-83-52-71.compute-1.amazonaws.com:5432/d74440l4p0o95
+if (process.env.DATABASE_URL){
+   myconnection = process.env.DATABASE_URL;
+}
+else {
+   myconnection = {
+    host     : '127.0.0.1',
+    user     : 'postgres',
+    password : 'zenkit123',
+    database : 'mytestpg'
+  };
+}
+
+console.log('k1');
+var knex = require('knex')({
+  client: 'pg',
+  connection: myconnection
+});
+
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    console.log('local strat:'+ username + ' ' + password);
+  
+    knex.select('myname','mypassword').from('mypostusers') .where('myname',username)
+      .then(function(users){
+        console.log('found'+users[0]);
+        if (users.length===0){
+             return done(null, false, { message: 'No existing username.' });
+        }
+
+          if (users[0].mypassword === password){
+                console.log('success');
+            return done(null, users[0]);
+          }
+            else {
+                    console.log('login failed');
+              return done(null, false, { message: 'Incorrect username.' });
+          }
+          console.log(users[0]);
+      });
+  
+  }
+
+));
+
 
 
 
@@ -97,11 +148,13 @@ app.get('/', routes.index); //q: was ist index hier? eine datei oder ein export 
 app.get('/partials/:name', routes.partials); // q: wo wird diese routen aufgerufen???
 
 
-  api.init(passport);
+api.init(passport);
 
 // JSON API
 app.get('/api/currentuser', api.getCurrentUser); // in api.js
 app.post('/api/login', api.loginPostMethod); // in api.js
+app.post('/api/adduser', api.addUserPostMethod); // in api.js
+app.post('/api/logout', api.logoutPostMethod); // in api.js
 app.get('/api/clone/:id', api.clonePostMethod); // in api.js
 app.get('/api/posts', api.posts);
 app.get('/api/post/:id', api.post);
